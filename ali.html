@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Witcher Realm Leaderboard</title>
+    <style>
+        /* Previous styles remain the same until team-row */
+        @import url('https://fonts.googleapis.com/css2?family=MedievalSharp&family=Cinzel+Decorative:wght@400;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cinzel Decorative', cursive;
+            background-color: #0a0a0a;
+            background-image: 
+                radial-gradient(circle at center, #400 0%, transparent 70%),
+                repeating-linear-gradient(45deg, #200 0%, #200 10%, #300 10%, #300 20%);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .card {
+            background: linear-gradient(145deg, #2a0000 0%, #600 50%, #2a0000 100%);
+            border-radius: 12px;
+            width: 100%;
+            max-width: 900px;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.2),
+                        0 0 40px rgba(0, 0, 0, 0.4);
+            position: relative;
+            border: 1px solid #800;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                linear-gradient(45deg, transparent 65%, rgba(255,255,255,0.1) 70%, transparent 75%);
+            pointer-events: none;
+        }
+
+        .card-header {
+            padding: 30px 20px;
+            border-bottom: 2px solid rgba(255, 200, 150, 0.2);
+            background: linear-gradient(to right, transparent, rgba(80, 0, 0, 0.6), transparent);
+            position: relative;
+        }
+
+        .card-title {
+            font-family: 'MedievalSharp', cursive;
+            color: #ffd700;
+            font-size: 2.5rem;
+            text-align: center;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+            letter-spacing: 2px;
+        }
+
+        /* New alliance group styles */
+        .alliance-group {
+            margin-bottom: 25px;
+            position: relative;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 12px;
+            padding: 15px;
+            background: rgba(51, 0, 0, 0.3);
+        }
+
+        .alliance-group::before {
+            content: 'Allied Forces';
+            position: absolute;
+            top: -12px;
+            left: 20px;
+            background: #600;
+            padding: 2px 15px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            color: #ffd700;
+            border: 1px solid #ffd700;
+        }
+        .team-row {
+            display: grid;
+            grid-template-columns: 60px minmax(200px, 2fr) repeat(2, 180px);
+            gap: 20px;
+            align-items: center;
+            padding: 15px;
+            background: linear-gradient(90deg, rgba(51, 0, 0, 0.8) 0%, rgba(102, 0, 0, 0.8) 50%, rgba(51, 0, 0, 0.8) 100%);
+            margin-bottom: 15px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 200, 150, 0.1);
+        }
+
+        .team-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .team-stats {
+            display: contents;
+        }
+
+        .stat {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 5px 10px;
+            border-radius: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            justify-content: center;
+        }
+
+        @media (max-width: 768px) {
+            .team-row {
+                grid-template-columns: 50px 1fr;
+                gap: 10px;
+            }
+
+            .team-stats {
+                grid-column: 1 / -1;
+                display: flex;
+                justify-content: space-around;
+            }
+        }
+
+        .team-row {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background: linear-gradient(90deg, rgba(51, 0, 0, 0.8) 0%, rgba(102, 0, 0, 0.8) 50%, rgba(51, 0, 0, 0.8) 100%);
+            margin-bottom: 15px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 200, 150, 0.1);
+            position: relative;
+        }
+
+        .alliance-group .team-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .team-row:hover {
+            transform: translateX(5px);
+            background: linear-gradient(90deg, rgba(102, 0, 0, 0.8) 0%, rgba(153, 0, 0, 0.8) 50%, rgba(102, 0, 0, 0.8) 100%);
+            border-color: rgba(255, 200, 150, 0.3);
+            box-shadow: -5px 0 15px rgba(255, 0, 0, 0.2);
+        }
+
+        .rank {
+            width: 50px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #ffd700;
+            text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+        }
+
+        .team-info {
+            display: flex;
+            align-items: center;
+            flex: 1;
+            gap: 15px;
+        }
+
+        .team-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #ffd;
+            text-shadow: 0 0 5px rgba(255, 255, 221, 0.3);
+        }
+        .stats-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .stats-label {
+            font-size: 0.7rem;
+            color: #ffd700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-align: center;
+            margin-bottom: -4px;
+        }
+        .alliance-stat {
+            border: 1px solid #ffd700;
+            background: rgba(255, 215, 0, 0.1);
+        }
+
+        .alliance-status {
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            color: #ffd700;
+        }
+
+        .team-stats {
+            display: flex;
+            gap: 24px;
+            margin-right: 10px;
+        }
+
+        .stat {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 5px 10px;
+            border-radius: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            justify-content: center;
+        }
+
+        .stat-icon {
+            width: 20px;
+            height: 20px;
+            filter: drop-shadow(0 0 2px currentColor);
+        }
+        .individual-stat {
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .stats-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .attack { 
+            color: #ff6666;
+            border: 1px solid rgba(255, 102, 102, 0.3);
+        }
+
+        .health { 
+            color: #66ff66;
+            border: 1px solid rgba(102, 255, 102, 0.3);
+        }
+
+        /* Decorative elements */
+        .corner {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            border: 2px solid #ffd700;
+            opacity: 0.5;
+        }
+
+        .top-left {
+            top: 10px;
+            left: 10px;
+            border-right: none;
+            border-bottom: none;
+        }
+
+        .top-right {
+            top: 10px;
+            right: 10px;
+            border-left: none;
+            border-bottom: none;
+        }
+
+        .bottom-left {
+            bottom: 10px;
+            left: 10px;
+            border-right: none;
+            border-top: none;
+        }
+
+        .bottom-right {
+            bottom: 10px;
+            right: 10px;
+            border-left: none;
+            border-top: none;
+        }
+        
+        @media (max-width: 900px) {
+            .team-row {
+                grid-template-columns: 50px 1fr;
+                gap: 10px;
+            }
+
+            .stats-container {
+                grid-column: 1 / -1;
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+                margin-top: 10px;
+            }
+        }
+        @media (max-width: 768px) {
+            .card-title {
+                font-size: 1.8rem;
+            }
+
+            .team-stats {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .team-row {
+                flex-wrap: wrap;
+            }
+
+            .team-info {
+                margin-bottom: 10px;
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="corner top-left"></div>
+        <div class="corner top-right"></div>
+        <div class="corner bottom-left"></div>
+        <div class="corner bottom-right"></div>
+        <div class="card-header">
+            <h1 class="card-title">Witcher Realm Leaderboard</h1>
+        </div>
+        <div class="card-content" id="leaderboard">
+            <!-- Teams will be inserted here by JavaScript -->
+        </div>
+    </div>
+
+    <script>
+        const teams = [
+            { name: "School of the Wolf", attack: 89, health: 950, allianceId: 1 },
+            { name: "Nilfgaardian Elite", attack: 75, health: 880, allianceId: 1 },
+            { name: "Temerian Special Forces", attack: 82, health: 820, allianceId: 2 },
+            { name: "Skellige Raiders", attack: 95, health: 750, allianceId: 2 },
+            { name: "School of the Cat", attack: 87, health: 700, allianceId: null },
+            { name: "Redanian Knights", attack: 70, health: 680, allianceId: 3 },
+            { name: "School of the Griffin", attack: 78, health: 650, allianceId: 3 },
+            { name: "Scoia'tael Rebels", attack: 85, health: 600, allianceId: null },
+            { name: "School of the Viper", attack: 92, health: 580, allianceId: null },
+            { name: "Kaedweni Warriors", attack: 73, health: 550, allianceId: null }
+        ];
+
+        function calculateAllianceStats(teams, allianceId) {
+            const alliedTeams = teams.filter(t => t.allianceId === allianceId);
+            const sortedTeams = [...alliedTeams].sort((a, b) => b.health - a.health);
+            const maxHealth = sortedTeams[0].health;
+            const minHealth = sortedTeams[1].health;
+            
+            return {
+                totalHealth: maxHealth + (minHealth * 0.5),
+                totalAttack: alliedTeams.reduce((sum, t) => sum + t.attack, 0),
+                teams: alliedTeams
+            };
+        }
+
+        function createTeamRow(team, index, allianceStats = null) {
+            const displayHealth = allianceStats ? allianceStats.totalHealth : team.health;
+            const displayAttack = allianceStats ? allianceStats.totalAttack : team.attack;
+
+            return `
+                <div class="team-row">
+                    <div class="rank">#${index}</div>
+                    <div class="team-info">
+                        <span class="team-name">${team.name}</span>
+                        <span class="alliance-status">
+                            ${team.allianceId ? 'Allied' : 'Independent'}
+                        </span>
+                    </div>
+                    <div class="stats-container">
+                        <div class="stats-label">Attack</div>
+                        <div class="stats-group">
+                            <div class="stat individual-stat">
+                                <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M14.5 17.5L3 6l3-3 11.5 11.5-3 3z"/>
+                                    <path d="M13 19l6-6"/>
+                                    <path d="M16 16l4-4"/>
+                                </svg>
+                                <span>${team.attack}</span>
+                            </div>
+                            ${team.allianceId ? `
+                            <div class="stat alliance-stat">
+                                <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M14.5 17.5L3 6l3-3 11.5 11.5-3 3z"/>
+                                    <path d="M13 19l6-6"/>
+                                    <path d="M16 16l4-4"/>
+                                </svg>
+                                <span>${displayAttack}</span>
+                            </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                    <div class="stats-container">
+                        <div class="stats-label">Health</div>
+                        <div class="stats-group">
+                            <div class="stat individual-stat">
+                                <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                                </svg>
+                                <span>${team.health}</span>
+                            </div>
+                            ${team.allianceId ? `
+                            <div class="stat alliance-stat">
+                                <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                                </svg>
+                                <span>${Math.round(displayHealth)}</span>
+                            </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderLeaderboard() {
+            const leaderboardElement = document.getElementById('leaderboard');
+            let html = '';
+            let currentIndex = 1;
+
+            // Get unique alliance IDs
+            const alliances = [...new Set(teams.filter(t => t.allianceId !== null).map(t => t.allianceId))];
+            
+            // Calculate and sort alliances by total health
+            const sortedAlliances = alliances
+                .map(id => ({
+                    id,
+                    ...calculateAllianceStats(teams, id)
+                }))
+                .sort((a, b) => b.totalHealth - a.totalHealth);
+
+            // Independent teams
+            const independentTeams = teams
+                .filter(t => t.allianceId === null)
+                .sort((a, b) => b.health - a.health);
+
+            // Combine and sort all entries
+            const allEntries = [
+                ...sortedAlliances.map(alliance => ({
+                    type: 'alliance',
+                    health: alliance.totalHealth,
+                    data: alliance
+                })),
+                ...independentTeams.map(team => ({
+                    type: 'independent',
+                    health: team.health,
+                    data: team
+                }))
+            ].sort((a, b) => b.health - a.health);
+
+            // Render all entries in order
+            allEntries.forEach(entry => {
+                if (entry.type === 'alliance') {
+                    html += '<div class="alliance-group">';
+                    entry.data.teams.forEach(team => {
+                        html += createTeamRow(team, currentIndex, entry.data);
+                    });
+                    html += '</div>';
+                    currentIndex++;
+                } else {
+                    html += createTeamRow(entry.data, currentIndex);
+                    currentIndex++;
+                }
+            });
+
+            leaderboardElement.innerHTML = html;
+        }
+
+        // Initial render
+        renderLeaderboard();
+    </script>
+</body>
+</html>
