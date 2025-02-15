@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: 'Arial', sans-serif;
+        }
+        .map-container {
+            width: 1200px;
+            height: 900px;
+            background: #1a1a1a;
+            border: 3px solid #333;
+            border-radius: 10px;
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
+            padding: 20px;
+        }
+        .kingdom {
+            fill: currentColor;
+            fill-opacity: 0.3;
+            stroke: currentColor;
+            stroke-width: 3;
+            transition: all 0.3s;
+            filter: drop-shadow(0 0 10px currentColor);
+        }
+        .kingdom:hover {
+            fill-opacity: 0.4;
+            filter: drop-shadow(0 0 15px currentColor);
+        }
+        .city {
+            cursor: pointer;
+            transition: all 0.5s ease-out;
+        }
+        .city circle {
+            fill: #fff;
+            stroke: currentColor;
+            stroke-width: 3;
+            filter: drop-shadow(0 0 5px currentColor);
+        }
+        .city-center {
+            fill: currentColor;
+        }
+        .city text {
+            font-size: 16px;
+            fill: #fff;
+            text-anchor: middle;
+            font-weight: bold;
+            pointer-events: none;
+            text-shadow: 0 0 5px #000;
+        }
+        .city:hover circle {
+            transform: scale(1.3);
+            filter: drop-shadow(0 0 10px currentColor);
+        }
+        .removing {
+            opacity: 0;
+            transform: scale(0);
+        }
+        .kingdom-name {
+            font-size: 24px;
+            fill: #fff;
+            font-weight: bold;
+            text-shadow: 0 0 5px #000;
+        }
+    </style>
+</head>
+<body>
+    <div class="map-container">
+        <svg width="100%" height="100%" viewBox="0 0 1200 900">
+            <!-- Kingdoms with distinct colors -->
+            <g id="kingdoms">
+                <g style="color: #FF4B4B">
+                    <path class="kingdom" d="M100,100 Q100,50 200,80 T300,120 T400,80 L450,200 L350,250 L200,220 Z"/>
+                    <text x="250" y="150" class="kingdom-name">Northern Empire</text>
+                </g>
+                <g style="color: #4169E1">
+                    <path class="kingdom" d="M420,50 Q470,80 520,50 T620,70 T720,40 L750,160 L650,210 L500,180 Z"/>
+                    <text x="600" y="100" class="kingdom-name">Azure Peaks</text>
+                </g>
+                <g style="color: #32CD32">
+                    <path class="kingdom" d="M100,280 Q150,230 200,250 T300,300 T400,260 L450,380 L350,430 L200,400 Z"/>
+                    <text x="250" y="330" class="kingdom-name">Emerald Vale</text>
+                </g>
+                <g style="color: #FFD700">
+                    <path class="kingdom" d="M420,230 Q470,260 520,230 T620,250 T720,220 L750,340 L650,390 L500,360 Z"/>
+                    <text x="600" y="280" class="kingdom-name">Golden Realm</text>
+                </g>
+                <g style="color: #9370DB">
+                    <path class="kingdom" d="M100,460 Q150,410 200,420 T300,460 T400,440 L450,560 L350,610 L200,580 Z"/>
+                    <text x="250" y="510" class="kingdom-name">Purple Heights</text>
+                </g>
+                <g style="color: #FF8C00">
+                    <path class="kingdom" d="M420,410 Q470,440 520,410 T620,430 T720,400 L750,520 L650,570 L500,540 Z"/>
+                    <text x="600" y="460" class="kingdom-name">Amber Coast</text>
+                </g>
+                <g style="color: #20B2AA">
+                    <path class="kingdom" d="M100,640 Q150,590 200,600 T300,620 T400,620 L450,740 L350,790 L200,760 Z"/>
+                    <text x="250" y="690" class="kingdom-name">Turquoise Bay</text>
+                </g>
+                <g style="color: #BA55D3">
+                    <path class="kingdom" d="M420,590 Q470,620 520,590 T620,610 T720,580 L750,700 L650,750 L500,720 Z"/>
+                    <text x="600" y="640" class="kingdom-name">Orchid Plains</text>
+                </g>
+                <g style="color: #CD853F">
+                    <path class="kingdom" d="M800,100 Q800,50 890,100 T950,120 L970,240 L880,290 L750,260 Z"/>
+                    <text x="850" y="170" class="kingdom-name">Bronze Hills</text>
+                </g>
+                <g style="color: #48D1CC">
+                    <path class="kingdom" d="M800,500 Q800,450 850,500 T950,520 L980,640 L880,690 L750,660 Z"/>
+                    <text x="850" y="570" class="kingdom-name">Crystal Isle</text>
+                </g>
+            </g>
+        </svg>
+    </div>
+
+    <script>
+        function createFixedCities() {
+            const svg = document.querySelector('svg');
+            const kingdoms = document.querySelectorAll('[style*="color"]');
+            
+            kingdoms.forEach((kingdom) => {
+                const bbox = kingdom.querySelector('.kingdom').getBBox();
+                const color = kingdom.style.color;
+                
+                // Fixed positions relative to kingdom center
+                const centerX = bbox.x + bbox.width / 2;
+                const centerY = bbox.y + bbox.height / 2;
+                const radius = Math.min(bbox.width, bbox.height) * 0.25;
+                
+                // Define fixed positions for 6 cities
+                const positions = [
+                    [0, 0],           // Center (Capital)
+                    [0, -1],          // North
+                    [0.866, -0.5],    // Northeast
+                    [0.866, 0.5],     // Southeast
+                    [0, 1],           // South
+                    [-0.866, 0.5],    // Southwest
+                    [-0.866, -0.5],   // Northwest
+                ];
+
+                positions.forEach((pos, i) => {
+                    const x = centerX + pos[0] * radius;
+                    const y = centerY + pos[1] * radius;
+                    
+                    const cityGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+                    cityGroup.classList.add('city');
+                    cityGroup.style.color = color;
+                    
+                    const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                    circle.setAttribute('cx', x);
+                    circle.setAttribute('cy', y);
+                    circle.setAttribute('r', i === 0 ? '12' : '8');
+                    
+                    const centerDot = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                    centerDot.setAttribute('cx', x);
+                    centerDot.setAttribute('cy', y);
+                    centerDot.setAttribute('r', i === 0 ? '6' : '4');
+                    centerDot.classList.add('city-center');
+                    
+                    const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                    text.setAttribute('x', x);
+                    text.setAttribute('y', y - 20);
+                    text.textContent = i === 0 ? 'Capital' : `City ${i}`;
+                    
+                    cityGroup.appendChild(circle);
+                    cityGroup.appendChild(centerDot);
+                    cityGroup.appendChild(text);
+                    
+                    cityGroup.addEventListener('click', function() {
+                        cityGroup.classList.add('removing');
+                        setTimeout(() => {
+                            cityGroup.remove();
+                        }, 500);
+                    });
+                    
+                    svg.appendChild(cityGroup);
+                });
+            });
+        }
+
+        createFixedCities();
+    </script>
+</body>
+</html>
