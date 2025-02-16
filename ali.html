@@ -333,146 +333,113 @@
     </div>
 
     <script>
-        const teams = [
-            { name: "School of the Wolf", attack: 89, health: 950, allianceId: 1 },
-            { name: "Nilfgaardian Elite", attack: 75, health: 880, allianceId: 1 },
-            { name: "Temerian Special Forces", attack: 82, health: 820, allianceId: 2 },
-            { name: "Skellige Raiders", attack: 95, health: 750, allianceId: 2 },
-            { name: "School of the Cat", attack: 87, health: 700, allianceId: null },
-            { name: "Redanian Knights", attack: 70, health: 680, allianceId: 3 },
-            { name: "School of the Griffin", attack: 78, health: 650, allianceId: 3 },
-            { name: "Scoia'tael Rebels", attack: 85, health: 600, allianceId: null },
-            { name: "School of the Viper", attack: 92, health: 580, allianceId: null },
-            { name: "Kaedweni Warriors", attack: 73, health: 550, allianceId: null }
-        ];
+    const teams = [
+        { name: "School of the Wolf", attack: 89, health: 950, allianceId: 1 },
+        { name: "Nilfgaardian Elite", attack: 75, health: 880, allianceId: 1 },
+        { name: "Temerian Special Forces", attack: 82, health: 820, allianceId: 2 },
+        { name: "Skellige Raiders", attack: 95, health: 750, allianceId: 2 },
+        { name: "School of the Cat", attack: 87, health: 700, allianceId: null },
+        { name: "Redanian Knights", attack: 70, health: 680, allianceId: 3 },
+        { name: "School of the Griffin", attack: 78, health: 650, allianceId: 3 },
+        { name: "Scoia'tael Rebels", attack: 85, health: 600, allianceId: null },
+        { name: "School of the Viper", attack: 92, health: 580, allianceId: null },
+        { name: "Kaedweni Warriors", attack: 73, health: 550, allianceId: null }
+    ];
 
-        function calculateAllianceStats(teams, allianceId) {
-            const alliedTeams = teams.filter(t => t.allianceId === allianceId);
-            const sortedTeams = [...alliedTeams].sort((a, b) => b.health - a.health);
-            const maxHealth = sortedTeams[0].health;
-            const minHealth = sortedTeams[1].health;
-            
-            return {
-                totalHealth: maxHealth + (minHealth * 1),
-                totalAttack: alliedTeams.reduce((sum, t) => sum + t.attack, 0),
-                teams: alliedTeams
-            };
-        }
+    function calculateAllianceStats(teams, allianceId) {
+        const alliedTeams = teams.filter(t => t.allianceId === allianceId);
+        return {
+            totalHealth: alliedTeams.reduce((sum, t) => sum + t.health, 0),
+            totalAttack: alliedTeams.reduce((sum, t) => sum + t.attack, 0),
+            teams: alliedTeams
+        };
+    }
 
-        function createTeamRow(team, index, allianceStats = null) {
-            const displayHealth = allianceStats ? allianceStats.totalHealth : team.health;
-            const displayAttack = allianceStats ? allianceStats.totalAttack : team.attack;
+    function createTeamRow(team, index, allianceStats = null) {
+        const displayHealth = allianceStats ? allianceStats.totalHealth : team.health;
+        const displayAttack = allianceStats ? allianceStats.totalAttack : team.attack;
 
-            return `
-                <div class="team-row">
-                    <div class="rank">#${index}</div>
-                    <div class="team-info">
-                        <span class="team-name">${team.name}</span>
-                        <span class="alliance-status">
-                            ${team.allianceId ? 'Allied' : 'Independent'}
-                        </span>
-                    </div>
-                    <div class="stats-container">
-                        <div class="stats-label">Attack</div>
-                        <div class="stats-group">
-                            <div class="stat individual-stat">
-                                <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M14.5 17.5L3 6l3-3 11.5 11.5-3 3z"/>
-                                    <path d="M13 19l6-6"/>
-                                    <path d="M16 16l4-4"/>
-                                </svg>
-                                <span>${team.attack}</span>
-                            </div>
-                            ${team.allianceId ? `
-                            <div class="stat alliance-stat">
-                                <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M14.5 17.5L3 6l3-3 11.5 11.5-3 3z"/>
-                                    <path d="M13 19l6-6"/>
-                                    <path d="M16 16l4-4"/>
-                                </svg>
-                                <span>${displayAttack}</span>
-                            </div>
-                            ` : ''}
-                        </div>
-                    </div>
-                    <div class="stats-container">
-                        <div class="stats-label">Health</div>
-                        <div class="stats-group">
-                            <div class="stat individual-stat">
-                                <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                                </svg>
-                                <span>${team.health}</span>
-                            </div>
-                            ${team.allianceId ? `
-                            <div class="stat alliance-stat">
-                                <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                                </svg>
-                                <span>${Math.round(displayHealth)}</span>
-                            </div>
-                            ` : ''}
-                        </div>
+        return `
+            <div class="team-row">
+                <div class="rank">#${index}</div>
+                <div class="team-info">
+                    <span class="team-name">${team.name}</span>
+                    <span class="alliance-status">
+                        ${team.allianceId ? 'Allied' : 'Independent'}
+                    </span>
+                </div>
+                <div class="stats-container">
+                    <div class="stats-label">Attack</div>
+                    <div class="stats-group">
+                        <div class="stat individual-stat">${team.attack}</div>
+                        ${team.allianceId ? `<div class="stat alliance-stat">${displayAttack}</div>` : ''}
                     </div>
                 </div>
-            `;
-        }
+                <div class="stats-container">
+                    <div class="stats-label">Health</div>
+                    <div class="stats-group">
+                        <div class="stat individual-stat">${team.health}</div>
+                        ${team.allianceId ? `<div class="stat alliance-stat">${displayHealth}</div>` : ''}
+                    </div>
+                </div>
+            </div>
+        `;
+    }
 
-        function renderLeaderboard() {
-            const leaderboardElement = document.getElementById('leaderboard');
-            let html = '';
-            let currentIndex = 1;
+    function renderLeaderboard() {
+        const leaderboardElement = document.getElementById('leaderboard');
+        let html = '';
+        let currentIndex = 1;
 
-            // Get unique alliance IDs
-            const alliances = [...new Set(teams.filter(t => t.allianceId !== null).map(t => t.allianceId))];
-            
-            // Calculate and sort alliances by total health
-            const sortedAlliances = alliances
-                .map(id => ({
-                    id,
-                    ...calculateAllianceStats(teams, id)
-                }))
-                .sort((a, b) => b.totalHealth - a.totalHealth);
+        // Get unique alliance IDs
+        const alliances = [...new Set(teams.filter(t => t.allianceId !== null).map(t => t.allianceId))];
+        
+        // Calculate and sort alliances by total health
+        const sortedAlliances = alliances
+            .map(id => ({
+                id,
+                ...calculateAllianceStats(teams, id)
+            }))
+            .sort((a, b) => b.totalHealth - a.totalHealth);
 
-            // Independent teams
-            const independentTeams = teams
-                .filter(t => t.allianceId === null)
-                .sort((a, b) => b.health - a.health);
+        // Independent teams
+        const independentTeams = teams
+            .filter(t => t.allianceId === null)
+            .sort((a, b) => b.health - a.health);
 
-            // Combine and sort all entries
-            const allEntries = [
-                ...sortedAlliances.map(alliance => ({
-                    type: 'alliance',
-                    health: alliance.totalHealth,
-                    data: alliance
-                })),
-                ...independentTeams.map(team => ({
-                    type: 'independent',
-                    health: team.health,
-                    data: team
-                }))
-            ].sort((a, b) => b.health - a.health);
+        // Combine and sort all entries
+        const allEntries = [
+            ...sortedAlliances.map(alliance => ({
+                type: 'alliance',
+                health: alliance.totalHealth,
+                data: alliance
+            })),
+            ...independentTeams.map(team => ({
+                type: 'independent',
+                health: team.health,
+                data: team
+            }))
+        ].sort((a, b) => b.health - a.health);
 
-            // Render all entries in order
-            allEntries.forEach(entry => {
-                if (entry.type === 'alliance') {
-                    html += '<div class="alliance-group">';
-                    entry.data.teams.forEach(team => {
-                        html += createTeamRow(team, currentIndex, entry.data);
-                    });
-                    html += '</div>';
-                    currentIndex++;
-                } else {
-                    html += createTeamRow(entry.data, currentIndex);
-                    currentIndex++;
-                }
-            });
+        // Render all entries in order
+        allEntries.forEach(entry => {
+            if (entry.type === 'alliance') {
+                html += '<div class="alliance-group">';
+                entry.data.teams.forEach(team => {
+                    html += createTeamRow(team, currentIndex, entry.data);
+                });
+                html += '</div>';
+                currentIndex++;
+            } else {
+                html += createTeamRow(entry.data, currentIndex);
+                currentIndex++;
+            }
+        });
 
-            leaderboardElement.innerHTML = html;
-        }
+        leaderboardElement.innerHTML = html;
+    }
 
-        // Initial render
-        renderLeaderboard();
-    </script>
+    renderLeaderboard();
+</script>
 </body>
 </html>
