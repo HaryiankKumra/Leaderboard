@@ -360,7 +360,7 @@
         }
 
         function createTeamRow(team, index, allianceStats = null) {
-            //const displayHealth = allianceStats ? allianceStats.totalHealth : team.health;
+            const displayHealth = allianceStats ? allianceStats.totalHealth : team.health;
             const displayAttack = allianceStats ? allianceStats.totalAttack : team.attack;
 
             return `
