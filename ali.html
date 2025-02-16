@@ -353,14 +353,14 @@
             const minHealth = sortedTeams[1].health;
             
             return {
-                totalHealth: maxHealth + (minHealth * 0.5),
+                totalHealth: maxHealth + (minHealth * 1),
                 totalAttack: alliedTeams.reduce((sum, t) => sum + t.attack, 0),
                 teams: alliedTeams
             };
         }
 
         function createTeamRow(team, index, allianceStats = null) {
-            const displayHealth = allianceStats ? allianceStats.totalHealth : team.health;
+            //const displayHealth = allianceStats ? allianceStats.totalHealth : team.health;
             const displayAttack = allianceStats ? allianceStats.totalAttack : team.attack;
 
             return `
